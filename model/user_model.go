@@ -17,7 +17,6 @@ type User struct {
 
 func (m User) ToDTO() dto.UserResponse {
 	userResponse := dto.UserResponse{
-		ID:        m.ID,
 		UserID:    m.UserID,
 		Name:      m.Name,
 		Email:     m.Email,

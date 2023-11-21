@@ -60,12 +60,16 @@ func main() {
 
 	//=================> Repository
 	userRepo := repository.NewUserRepository(DB)
+	teamRepo := repository.NewTeamRepository(DB)
 
 	//=================> Service
 	userService := service.NewUserService(userRepo)
+	teamService := service.NewTeamService(teamRepo)
 
 	//=================> Handler
 	userHandler := handler.NewUserHandler(userService)
+	teamHandler := handler.NewTeamHandler(teamService)
+
 	//Server
 	app := gin.Default()
 
@@ -91,6 +95,12 @@ func main() {
 	myselfEndpoint.Use(middleware.JWTMiddleware(DB))
 
 	myselfEndpoint.GET("/", userHandler.MySelf)
+
+	//=======================> Team Endpoint
+	teamEndpoint := app.Group("/api/team")
+	teamEndpoint.Use(middleware.JWTMiddleware(DB))
+
+	teamEndpoint.POST("/create", teamHandler.CreateTeam)
 
 	//Init Server
 	srv := &http.Server{
