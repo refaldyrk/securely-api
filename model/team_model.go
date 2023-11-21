@@ -36,4 +36,7 @@ type TeamMember struct {
 	AccessKey string             `json:"access_key" bson:"access_key"`
 	CreatedAt int64              `json:"created_at" bson:"created_at"`
 	UpdatedAt int64              `json:"updated_at" bson:"updated_at"`
+
+	//Not Save In DB
+	Team *Team `json:"team,omitempty" bson:"team,omitempty"`
 }

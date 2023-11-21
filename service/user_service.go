@@ -25,7 +25,7 @@ func NewUserService(userRepository *repository.UserRepository) *UserService {
 func (u *UserService) Register(ctx context.Context, data dto.RegisterUserReq) (dto.UserResponse, error) {
 	userCheck, err := u.userRepository.Find(ctx, bson.M{"email": data.Email})
 
-	if !userCheck.ID.IsZero() || errors.Is(err, qmgo.ErrNoSuchDocuments) {
+	if !userCheck.ID.IsZero() || !errors.Is(err, qmgo.ErrNoSuchDocuments) {
 		return dto.UserResponse{}, errors.New("email not available")
 	}
 	//Password Hash

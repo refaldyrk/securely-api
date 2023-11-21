@@ -56,3 +56,12 @@ func (t *TeamService) CreateTeam(ctx context.Context, userID string, data dto.Te
 
 	return dataTeam.ToDTO(), nil
 }
+
+func (t *TeamService) MyTeam(ctx context.Context, userID string) ([]model.TeamMember, error) {
+	teamByUserID, err := t.teamRepository.GetTeamByUserID(ctx, userID)
+	if err != nil {
+		return []model.TeamMember{}, err
+	}
+
+	return teamByUserID, nil
+}

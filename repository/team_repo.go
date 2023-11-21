@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/qiniu/qmgo"
 	"go.mongodb.org/mongo-driver/bson"
+	"securely-api/helper"
 	"securely-api/model"
 )
 
@@ -113,4 +114,45 @@ func (t *TeamRepository) DeleteMember(ctx context.Context, filter bson.M) error 
 	}
 
 	return nil
+}
+
+// Aggregate Or Advance Query
+
+func (t *TeamRepository) GetTeamByUserID(ctx context.Context, userID string) ([]model.TeamMember, error) {
+	var teams []model.TeamMember
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{
+				"$and": []bson.M{
+					{
+						"user_id": userID,
+					},
+				},
+			},
+		},
+		{
+			"$lookup": bson.M{
+				"from":         "Team",
+				"localField":   "team_id",
+				"foreignField": "team_id",
+				"as":           "team",
+			},
+		},
+		{
+			"$unwind": "$team",
+		},
+		{
+			"$project": helper.GetBSONTagMap(&model.TeamMember{}, bson.M{
+				"order": "$team",
+			}),
+		},
+	}
+
+	err := t.DB.Collection("Member").Aggregate(ctx, pipeline).All(&teams)
+	if err != nil {
+		return []model.TeamMember{}, err
+	}
+
+	return teams, nil
+
 }

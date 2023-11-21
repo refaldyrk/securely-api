@@ -100,6 +100,7 @@ func main() {
 	teamEndpoint := app.Group("/api/team")
 	teamEndpoint.Use(middleware.JWTMiddleware(DB))
 
+	teamEndpoint.GET("/", teamHandler.MyTeam)
 	teamEndpoint.POST("/create", teamHandler.CreateTeam)
 
 	//Init Server

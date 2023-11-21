@@ -40,3 +40,21 @@ func (t *TeamHandler) CreateTeam(c *gin.Context) {
 	return
 
 }
+
+func (t *TeamHandler) MyTeam(c *gin.Context) {
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, helper.ResponseAPI(false, http.StatusUnprocessableEntity, "unauthorized", gin.H{}))
+		return
+	}
+
+	team, err := t.teamService.MyTeam(c, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, helper.ResponseAPI(false, http.StatusInternalServerError, err.Error(), gin.H{}))
+		return
+	}
+
+	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success get my team", team))
+	return
+
+}
