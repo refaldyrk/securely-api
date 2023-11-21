@@ -11,3 +11,7 @@ type TeamResponse struct {
 type TeamReq struct {
 	Name string `json:"name" bson:"name" binding:"required"`
 }
+
+type TeamInviteReq struct {
+	Email string `json:"email" bson:"email" binding:"required"`
+}

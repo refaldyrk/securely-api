@@ -64,7 +64,7 @@ func main() {
 
 	//=================> Service
 	userService := service.NewUserService(userRepo)
-	teamService := service.NewTeamService(teamRepo)
+	teamService := service.NewTeamService(teamRepo, userRepo)
 
 	//=================> Handler
 	userHandler := handler.NewUserHandler(userService)
@@ -102,6 +102,7 @@ func main() {
 
 	teamEndpoint.GET("/", teamHandler.MyTeam)
 	teamEndpoint.POST("/create", teamHandler.CreateTeam)
+	teamEndpoint.POST("/invite/:team_id", teamHandler.InviteMember)
 
 	//Init Server
 	srv := &http.Server{

@@ -58,3 +58,29 @@ func (t *TeamHandler) MyTeam(c *gin.Context) {
 	return
 
 }
+
+func (t *TeamHandler) InviteMember(c *gin.Context) {
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, helper.ResponseAPI(false, http.StatusUnprocessableEntity, "unauthorized", gin.H{}))
+		return
+	}
+
+	teamID := c.Param("team_id")
+
+	var teamInvReq dto.TeamInviteReq
+	err := c.ShouldBindJSON(&teamInvReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, helper.ResponseAPI(false, http.StatusBadRequest, err.Error(), gin.H{}))
+		return
+	}
+
+	err = t.teamService.InviteMember(c, userID, teamInvReq.Email, teamID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, helper.ResponseAPI(false, http.StatusInternalServerError, err.Error(), gin.H{}))
+		return
+	}
+
+	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success invite", gin.H{}))
+	return
+}
