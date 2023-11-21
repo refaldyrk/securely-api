@@ -32,6 +32,8 @@ type TeamMember struct {
 	MemberID  string             `json:"member_id" bson:"member_id"`
 	UserID    string             `json:"user_id" bson:"user_id"`
 	TeamID    string             `json:"team_id" bson:"team_id"`
+	Role      string             `json:"role" bson:"role"`
+	AccessKey string             `json:"access_key" bson:"access_key"`
 	CreatedAt int64              `json:"created_at" bson:"created_at"`
 	UpdatedAt int64              `json:"updated_at" bson:"updated_at"`
 }

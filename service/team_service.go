@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"securely-api/constant"
 	"securely-api/dto"
 	"securely-api/helper"
 	"securely-api/model"
@@ -35,11 +36,15 @@ func (t *TeamService) CreateTeam(ctx context.Context, userID string, data dto.Te
 		return dto.TeamResponse{}, err
 	}
 
+	accessKey := helper.NewXID()
+
 	teamMember := model.TeamMember{
 		ID:        primitive.NewObjectID(),
 		MemberID:  helper.NewXID(),
 		UserID:    dataTeam.OwnerID,
 		TeamID:    dataTeam.TeamID,
+		Role:      constant.ROLE_OWNER,
+		AccessKey: helper.EncryptAES(accessKey),
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),
 	}
