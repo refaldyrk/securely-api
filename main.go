@@ -103,6 +103,7 @@ func main() {
 	teamEndpoint.GET("/", teamHandler.MyTeam)
 	teamEndpoint.POST("/create", teamHandler.CreateTeam)
 	teamEndpoint.POST("/invite/:team_id", teamHandler.InviteMember)
+	teamEndpoint.DELETE("/kick/:team_id", teamHandler.KickMember)
 
 	//Init Server
 	srv := &http.Server{

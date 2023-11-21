@@ -129,3 +129,51 @@ func (t *TeamService) InviteMember(ctx context.Context, userID, email, teamID st
 
 	return nil
 }
+
+func (t *TeamService) KickMember(ctx context.Context, userID, email, teamID string) error {
+	user, err := t.userRepository.Find(ctx, bson.M{"email": email})
+	if err != nil || user.ID.IsZero() {
+		if errors.Is(err, qmgo.ErrNoSuchDocuments) {
+			return errors.New("user not found")
+		}
+		return err
+	}
+
+	//Check Role
+	inviter, err := t.teamRepository.FindMember(ctx, bson.M{"team_id": teamID, "user_id": userID})
+	if err != nil {
+		if errors.Is(err, qmgo.ErrNoSuchDocuments) {
+			return errors.New(" not found")
+		}
+		return err
+	}
+
+	if inviter.Role != constant.ROLE_OWNER {
+		return errors.New("access denied bcs u not owner, pls contact your owner to kick someone")
+	}
+
+	//Find Team
+	team, err := t.teamRepository.Find(ctx, bson.M{"team_id": teamID})
+	if err != nil {
+		return err
+	}
+
+	//Validate If Invite Is Not Exists
+	memberTeam, err := t.teamRepository.FindMember(ctx, bson.M{"user_id": user.UserID})
+	if errors.Is(err, qmgo.ErrNoSuchDocuments) {
+		return errors.New(" not found")
+	}
+
+	err = t.teamRepository.DeleteMember(ctx, bson.M{"member_id": memberTeam.MemberID})
+	if err != nil {
+		return err
+	}
+
+	//increment Your Team
+	err = t.teamRepository.Update(ctx, bson.M{"team_id": teamID}, bson.M{"updated_at": time.Now().Unix(), "total_member": team.TotalMember - 1})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

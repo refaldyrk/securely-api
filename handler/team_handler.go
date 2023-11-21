@@ -84,3 +84,29 @@ func (t *TeamHandler) InviteMember(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success invite", gin.H{}))
 	return
 }
+
+func (t *TeamHandler) KickMember(c *gin.Context) {
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, helper.ResponseAPI(false, http.StatusUnprocessableEntity, "unauthorized", gin.H{}))
+		return
+	}
+
+	teamID := c.Param("team_id")
+
+	var teamKickReq dto.TeamKickReq
+	err := c.ShouldBindJSON(&teamKickReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, helper.ResponseAPI(false, http.StatusBadRequest, err.Error(), gin.H{}))
+		return
+	}
+
+	err = t.teamService.KickMember(c, userID, teamKickReq.Email, teamID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, helper.ResponseAPI(false, http.StatusInternalServerError, err.Error(), gin.H{}))
+		return
+	}
+
+	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success kick", gin.H{}))
+	return
+}
