@@ -25,7 +25,7 @@ func (t *TeamService) CreateTeam(ctx context.Context, userID string, data dto.Te
 		OwnerID:     userID,
 		TeamID:      uuid.NewString(),
 		Name:        data.Name,
-		TotalMember: 0,
+		TotalMember: 1,
 		CreatedAt:   time.Now().Unix(),
 		UpdatedAt:   time.Now().Unix(),
 	}
