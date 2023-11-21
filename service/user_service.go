@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/google/uuid"
+	"github.com/qiniu/qmgo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"securely-api/dto"
@@ -23,11 +24,8 @@ func NewUserService(userRepository *repository.UserRepository) *UserService {
 
 func (u *UserService) Register(ctx context.Context, data dto.RegisterUserReq) (dto.UserResponse, error) {
 	userCheck, err := u.userRepository.Find(ctx, bson.M{"email": data.Email})
-	if err != nil {
-		return dto.UserResponse{}, errors.New("user not found")
-	}
 
-	if !userCheck.ID.IsZero() {
+	if !userCheck.ID.IsZero() || err == qmgo.ErrNoSuchDocuments {
 		return dto.UserResponse{}, errors.New("email not available")
 	}
 	//Password Hash
