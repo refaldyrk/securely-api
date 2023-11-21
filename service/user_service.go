@@ -22,6 +22,14 @@ func NewUserService(userRepository *repository.UserRepository) *UserService {
 }
 
 func (u *UserService) Register(ctx context.Context, data dto.RegisterUserReq) (dto.UserResponse, error) {
+	userCheck, err := u.userRepository.Find(ctx, bson.M{"email": data.Email})
+	if err != nil {
+		return dto.UserResponse{}, errors.New("user not found")
+	}
+
+	if !userCheck.ID.IsZero() {
+		return dto.UserResponse{}, errors.New("email not available")
+	}
 	//Password Hash
 	hashPassword, err := helper.HashPassword(data.Password)
 	if err != nil {
