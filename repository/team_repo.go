@@ -143,7 +143,46 @@ func (t *TeamRepository) GetTeamByUserID(ctx context.Context, userID string) ([]
 		},
 		{
 			"$project": helper.GetBSONTagMap(&model.TeamMember{}, bson.M{
-				"order": "$team",
+				"team": "$team",
+			}),
+		},
+	}
+
+	err := t.DB.Collection("Member").Aggregate(ctx, pipeline).All(&teams)
+	if err != nil {
+		return []model.TeamMember{}, err
+	}
+
+	return teams, nil
+
+}
+
+func (t *TeamRepository) GetMemberList(ctx context.Context, teamID string) ([]model.TeamMember, error) {
+	var teams []model.TeamMember
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{
+				"$and": []bson.M{
+					{
+						"team_id": teamID,
+					},
+				},
+			},
+		},
+		{
+			"$lookup": bson.M{
+				"from":         "User",
+				"localField":   "user_id",
+				"foreignField": "user_id",
+				"as":           "user",
+			},
+		},
+		{
+			"$unwind": "$user",
+		},
+		{
+			"$project": helper.GetBSONTagMap(&model.TeamMember{}, bson.M{
+				"user": "$user",
 			}),
 		},
 	}

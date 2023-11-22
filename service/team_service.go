@@ -227,3 +227,31 @@ func (t *TeamService) PromoteMember(ctx context.Context, userID, email, teamID, 
 
 	return nil
 }
+
+func (t *TeamService) GetMemberByTeamID(ctx context.Context, userID, teamID string) ([]model.TeamMember, error) {
+	// Check TeamID
+	team, err := t.teamRepository.Find(ctx, bson.M{"team_id": teamID})
+	if err != nil {
+		return []model.TeamMember{}, err
+	}
+
+	member, err := t.teamRepository.FindMember(ctx, bson.M{"team_id": team.TeamID, "user_id": userID})
+	if err != nil {
+		return []model.TeamMember{}, err
+	}
+
+	if member.ID.IsZero() {
+		return []model.TeamMember{}, errors.New("not found")
+	}
+
+	members, err := t.teamRepository.GetMemberList(ctx, team.TeamID)
+	if err != nil {
+		return []model.TeamMember{}, err
+	}
+
+	if len(members) <= 0 {
+		return []model.TeamMember{}, errors.New("not found")
+	}
+
+	return members, nil
+}

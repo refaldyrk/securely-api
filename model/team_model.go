@@ -39,4 +39,5 @@ type TeamMember struct {
 
 	//Not Save In DB
 	Team *Team `json:"team,omitempty" bson:"team,omitempty"`
+	User *User `json:"user,omitempty" bson:"user,omitempty"`
 }

@@ -136,3 +136,27 @@ func (t *TeamHandler) PromoteMember(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success promote", gin.H{}))
 	return
 }
+
+func (t *TeamHandler) MemberList(c *gin.Context) {
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, helper.ResponseAPI(false, http.StatusUnprocessableEntity, "unauthorized", gin.H{}))
+		return
+	}
+
+	teamID := c.Param("team")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, helper.ResponseAPI(false, http.StatusBadRequest, "errors", gin.H{}))
+		return
+	}
+
+	team, err := t.teamService.GetMemberByTeamID(c, userID, teamID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, helper.ResponseAPI(false, http.StatusInternalServerError, err.Error(), gin.H{}))
+		return
+	}
+
+	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success get list members", team))
+	return
+
+}

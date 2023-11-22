@@ -101,6 +101,7 @@ func main() {
 	teamEndpoint.Use(middleware.JWTMiddleware(DB))
 
 	teamEndpoint.GET("/", teamHandler.MyTeam)
+	teamEndpoint.GET("/member/:team", teamHandler.MemberList)
 	teamEndpoint.POST("/create", teamHandler.CreateTeam)
 	teamEndpoint.POST("/invite/:team_id", teamHandler.InviteMember)
 	teamEndpoint.PATCH("/promote/:team_id", teamHandler.PromoteMember)
