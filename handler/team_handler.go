@@ -110,3 +110,29 @@ func (t *TeamHandler) KickMember(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success kick", gin.H{}))
 	return
 }
+
+func (t *TeamHandler) PromoteMember(c *gin.Context) {
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, helper.ResponseAPI(false, http.StatusUnprocessableEntity, "unauthorized", gin.H{}))
+		return
+	}
+
+	teamID := c.Param("team_id")
+
+	var teamPromoteReq dto.TeamPromoteReq
+	err := c.ShouldBindJSON(&teamPromoteReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, helper.ResponseAPI(false, http.StatusBadRequest, err.Error(), gin.H{}))
+		return
+	}
+
+	err = t.teamService.PromoteMember(c, userID, teamPromoteReq.Email, teamID, teamPromoteReq.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, helper.ResponseAPI(false, http.StatusInternalServerError, err.Error(), gin.H{}))
+		return
+	}
+
+	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success promote", gin.H{}))
+	return
+}

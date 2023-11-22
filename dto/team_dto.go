@@ -19,3 +19,8 @@ type TeamInviteReq struct {
 type TeamKickReq struct {
 	Email string `json:"email" bson:"email" binding:"required"`
 }
+
+type TeamPromoteReq struct {
+	Role  string `json:"role" bson:"role" binding:"required"`
+	Email string `json:"email" bson:"email" binding:"required"`
+}

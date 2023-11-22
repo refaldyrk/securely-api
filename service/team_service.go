@@ -177,3 +177,53 @@ func (t *TeamService) KickMember(ctx context.Context, userID, email, teamID stri
 
 	return nil
 }
+
+func (t *TeamService) PromoteMember(ctx context.Context, userID, email, teamID, role string) error {
+	user, err := t.userRepository.Find(ctx, bson.M{"email": email})
+	if err != nil || user.ID.IsZero() {
+		if errors.Is(err, qmgo.ErrNoSuchDocuments) {
+			return errors.New("user not found")
+		}
+		return err
+	}
+
+	//Check Role
+	inviter, err := t.teamRepository.FindMember(ctx, bson.M{"team_id": teamID, "user_id": userID})
+	if err != nil {
+		if errors.Is(err, qmgo.ErrNoSuchDocuments) {
+			return errors.New(" not found")
+		}
+		return err
+	}
+
+	if inviter.Role != constant.ROLE_OWNER {
+		return errors.New("access denied bcs u not owner, pls contact your owner to promote someone")
+	}
+
+	//Find Team
+	team, err := t.teamRepository.Find(ctx, bson.M{"team_id": teamID})
+	if err != nil {
+		return err
+	}
+	if team.ID.IsZero() {
+		return errors.New(" not found")
+	}
+
+	//Validate If Member Is Not Exists
+	memberTeam, err := t.teamRepository.FindMember(ctx, bson.M{"user_id": user.UserID})
+	if errors.Is(err, qmgo.ErrNoSuchDocuments) {
+		return errors.New(" not found")
+	}
+
+	if memberTeam.Role == role {
+		return errors.New(" same")
+	}
+
+	//update Your Team
+	err = t.teamRepository.UpdateMember(ctx, bson.M{"member_id": memberTeam.MemberID}, bson.M{"updated_at": time.Now().Unix(), "role": role})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
