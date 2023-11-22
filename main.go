@@ -102,6 +102,7 @@ func main() {
 
 	teamEndpoint.GET("/", teamHandler.MyTeam)
 	teamEndpoint.GET("/member/:team", teamHandler.MemberList)
+	teamEndpoint.GET("/accessKey/:team", teamHandler.GetAccessKey)
 	teamEndpoint.POST("/create", teamHandler.CreateTeam)
 	teamEndpoint.POST("/invite/:team_id", teamHandler.InviteMember)
 	teamEndpoint.PATCH("/promote/:team_id", teamHandler.PromoteMember)

@@ -160,3 +160,27 @@ func (t *TeamHandler) MemberList(c *gin.Context) {
 	return
 
 }
+
+func (t *TeamHandler) GetAccessKey(c *gin.Context) {
+	userID := c.GetString("userID")
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, helper.ResponseAPI(false, http.StatusUnprocessableEntity, "unauthorized", gin.H{}))
+		return
+	}
+
+	teamID := c.Param("team")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, helper.ResponseAPI(false, http.StatusBadRequest, "errors", gin.H{}))
+		return
+	}
+
+	team, err := t.teamService.GetAccessKey(c, userID, teamID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, helper.ResponseAPI(false, http.StatusInternalServerError, err.Error(), gin.H{}))
+		return
+	}
+
+	c.JSON(http.StatusOK, helper.ResponseAPI(false, http.StatusOK, "success get key", team))
+	return
+
+}

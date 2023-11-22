@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/qiniu/qmgo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -254,4 +255,25 @@ func (t *TeamService) GetMemberByTeamID(ctx context.Context, userID, teamID stri
 	}
 
 	return members, nil
+}
+
+func (t *TeamService) GetAccessKey(ctx context.Context, userID, teamID string) (gin.H, error) {
+	// Check TeamID
+	team, err := t.teamRepository.Find(ctx, bson.M{"team_id": teamID})
+	if err != nil {
+		return gin.H{}, err
+	}
+
+	member, err := t.teamRepository.FindMember(ctx, bson.M{"team_id": team.TeamID, "user_id": userID})
+	if err != nil {
+		return gin.H{}, err
+	}
+
+	if member.ID.IsZero() {
+		return gin.H{}, errors.New("not found")
+	}
+
+	accessKey := helper.DecryptAES(member.AccessKey)
+
+	return gin.H{"key": accessKey}, nil
 }
