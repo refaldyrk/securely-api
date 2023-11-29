@@ -61,14 +61,17 @@ func main() {
 	//=================> Repository
 	userRepo := repository.NewUserRepository(DB)
 	teamRepo := repository.NewTeamRepository(DB)
+	environmentRepo := repository.NewEnvironmentRepository(DB)
 
 	//=================> Service
 	userService := service.NewUserService(userRepo)
 	teamService := service.NewTeamService(teamRepo, userRepo)
+	environmentService := service.NewEnvironmentService(environmentRepo, teamRepo)
 
 	//=================> Handler
 	userHandler := handler.NewUserHandler(userService)
 	teamHandler := handler.NewTeamHandler(teamService)
+	environmentHandler := handler.NewEnvironmentHandler(environmentService)
 
 	//Server
 	app := gin.Default()
@@ -107,6 +110,12 @@ func main() {
 	teamEndpoint.POST("/invite/:team_id", teamHandler.InviteMember)
 	teamEndpoint.PATCH("/promote/:team_id", teamHandler.PromoteMember)
 	teamEndpoint.DELETE("/kick/:team_id", teamHandler.KickMember)
+
+	///========================> Environment Endpoint
+	environmentEndpoint := app.Group("/api/environment")
+	environmentEndpoint.Use(middleware.JWTMiddleware(DB))
+
+	environmentEndpoint.POST("/", environmentHandler.AddEnvironment)
 
 	//Init Server
 	srv := &http.Server{

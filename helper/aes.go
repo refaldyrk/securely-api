@@ -12,3 +12,11 @@ func EncryptAES(s string) string {
 func DecryptAES(s string) string {
 	return aes256.Decrypt(s, viper.GetString("AES_SECRET_KEY"))
 }
+
+func EncryptAES2(s string, p string) string {
+	return aes256.Encrypt(s, p)
+}
+
+func DecryptAES2(s string, p string) string {
+	return aes256.Decrypt(s, p)
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/qiniu/qmgo"
+	"github.com/rs/xid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"securely-api/constant"
@@ -31,6 +32,7 @@ func (t *TeamService) CreateTeam(ctx context.Context, userID string, data dto.Te
 		OwnerID:     userID,
 		TeamID:      uuid.NewString(),
 		Name:        data.Name,
+		Teamkey:     xid.New().String(),
 		TotalMember: 1,
 		CreatedAt:   time.Now().Unix(),
 		UpdatedAt:   time.Now().Unix(),
